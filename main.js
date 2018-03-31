@@ -13,7 +13,23 @@ let customConfig;
              },
              success: function (res){
                console.log("ICE List: "+res.v.iceServers);
+               customConfig = res.v.iceServers;
              }});
+
+///
+///     Check wheather audio or video activation
+///
+var video_enable = true;
+var audio_enable = false;
+function video_handleClick(cb1) {
+  console.log("Video enable = " + cb1.checked);
+  video_enable = cb1.checked;
+}
+
+function audio_handleClick(cb2) {
+  console.log("Audio enable = " + cb2.checked);
+  audio_enable = cb2.checked;
+}
 
 
 ///
@@ -175,8 +191,7 @@ peer.on('connection', function(conn) {
 
 
 ///
-///     Use ROSLIB for publishing cmd/Twist topic
-///
+///     
 
 
 ///
@@ -211,7 +226,9 @@ peer.on('call', call => {
 ///		Get Media Stream
 ///
 function openStream(){
-	const config = {audio:false,video:true};
+	console.log('Debug: video:'+video_enable);
+  console.log('Debug: audio'+audio_enable);
+  const config = {audio:audio_enable,video:video_enable};
 	return navigator.mediaDevices.getUserMedia(config);
 }
 

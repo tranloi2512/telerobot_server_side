@@ -28,6 +28,10 @@
             </ul>
             <h3 id="my-peer">Your Id: </h3>
             <!-- <video id="localStream" width="300" controls></video> -->
+            <form action="">
+              <label for="cb1"><input id="cb_video" type="checkbox" checked="checked" onclick="video_handleClick(this);">Video Enable</label> 
+              <label for="cb2"><input id="cb_audio" type="checkbox" onclick="audio_handleClick(this);">Audio Enable</label>
+            </form>           
             <br /><br />
             <video id="remoteStream" width="600" controls></video>
             <br /><br />
