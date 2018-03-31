@@ -56,6 +56,9 @@ ros.on('close', function() {
 ///
 var speed_linear = 0.18;
 var speed_angular = 0.2;
+var speed_step = 0.01;
+var speed_max = 0.3;
+var speed_min = 0.1;
 var cmdVel = new ROSLIB.Topic({
   ros : ros,
   name : '/chefbot_cmd_vel',
@@ -176,6 +179,38 @@ peer.on('connection', function(conn) {
         twist.linear.x = 0;
         twist.angular.z = speed_angular;
         break;
+        
+        case 87:         
+          if (speed_linear <= speed_max )
+              {
+                speed_linear+=speed_step;
+              };
+          console.log('Increase Linear Speed:'+speed_linear);
+          break;
+        
+        case 83:        
+          if (speed_linear >= speed_min)
+              {
+                speed_linear -=speed_step;
+              }
+          console.log('Decrease Linear Speed:' +speed_linear);
+          break;
+
+        case 82:         
+          if(speed_angular <= speed_max)
+            {
+                speed_angular += speed_step;
+            }
+          console.log('Increase Angular Speed:' + speed_angular);
+          break;
+       
+        case 70:         
+          if(speed_angular >= speed_min)
+            {
+                speed_angular -= speed_step;
+            }
+          console.log('Decrease Angular Speed:' +speed_angular);
+          break;        
         default: 
         {
           console.log('out of desired key '+data)
