@@ -122,138 +122,89 @@ peer.on('connection', function(conn) {
       
      else {
       
-     
-
+      speed = Number(document.getElementById('linearXText').value);
+      turn = Number(document.getElementById('angularZText').value);
       switch (data) {
-        case 73:   
-         console.log('UP'); 
-        twist.linear.x = speed_linear;
-        twist.angular.z = 0;        
+        case 73:  //forward
+        //console.log('move forward');  
+        console.log("forward");
+        target_speed = speed;
+        target_turn = 0;
+        count++;
         break;
         
-        case 74:  
-        console.log('LEFT');
-        twist.linear.x = 0;
-        twist.angular.z = speed_angular;
-     
-        break;
-        
-        case 188:   
-        console.log('DOWN');
-        twist.linear.x = -speed_linear;
-        twist.angular.z = 0;        
-        break;
-    
-        case 76:   
-        console.log('RIGHT');
-        twist.linear.x = 0;
-        twist.angular.z = -speed_angular;        
-        break;
-        
-        case 75:   
-        console.log('STOP');
-        twist.linear.x = 0;
-        twist.angular.z = 0;
+        case 188: //backward
+        console.log('move backward');
+        target_speed = -speed;
+        target_turn = 0;
         break;
 
-        case 85:   
-        console.log('UP - LEFT');
-        twist.linear.x = speed_linear;
-        twist.angular.z = speed_angular;
+        case 74: //turn left
+        console.log('turn left');
+        target_speed = 0;
+        target_turn = turn;
         break;
 
-        case 79:   
-        console.log('UP - RIGHT');
-        twist.linear.x = speed_linear;
-        twist.angular.z = -speed_angular;        
+        case 76: //turn right
+        console.log('turn right');
+        target_speed = 0;
+        target_turn = -turn;
         break;
 
-        case 77:   
-        console.log('DOWN - LEFT');
-        twist.linear.x = -speed_linear;
-        twist.angular.z = speed_angular;
+        case 75: //stop
+        console.log("stop");
+        target_speed = 0;
+        target_turn = 0;
         break;
-
-        case 190:   
-        console.log('DOWN - RIGHT');
-        twist.linear.x = 0;
-        twist.angular.z = speed_angular;
-        break;
-        
-        case 87:         
-          if (speed_linear <= speed_max )
-              {
-                speed_linear+=speed_step;
-              };
-          console.log('Increase Linear Speed:'+speed_linear);
-          break;
-        
-        case 83:        
-          if (speed_linear >= speed_min)
-              {
-                speed_linear -=speed_step;
-              }
-          console.log('Decrease Linear Speed:' +speed_linear);
-          break;
-
-        case 82:         
-          if(speed_angular <= speed_max)
-            {
-                speed_angular += speed_step;
-            }
-          console.log('Increase Angular Speed:' + speed_angular);
-          break;
        
-        case 70:         
-          if(speed_angular >= speed_min)
-            {
-                speed_angular -= speed_step;
-            }
-          console.log('Decrease Angular Speed:' +speed_angular);
-          break;        
         default: 
         {
           console.log('out of desired key '+data)
         }; //end of default
       }; //emd of switch
- 
-      // Got all parame from key board event, 
       for (count = 0;count <=10; count++){
-          if (speed_linear > current_linear)
-                current_linear = Math.min( speed_linear, current_linear + speed_step );
-            else if (speed_linear < current_linear)
-                current_linear = Math.max( speed_linear, current_linear - speed_step );
+          if (target_speed > control_speed)
+                control_speed = Math.min( target_speed, control_speed + 0.02 );
+            else if (target_speed < control_speed)
+                control_speed = Math.max( target_speed, control_speed - 0.02 );
             else
-                current_linear = speed_linear;
+                control_speed = target_speed;
 
-            if (speed_angular > current_angular)
-                current_angular = Math.min( speed_angular, current_angular + speed_step );
-            else if (speed_angular < current_angular)
-                current_angular = Math.max( speed_angular, current_angular - speed_step );
+            if (target_turn > control_turn)
+                control_turn = Math.min( target_turn, control_turn + 0.1 );
+            else if (target_turn < control_turn)
+                control_turn = Math.max( target_turn, control_turn - 0.1 );
             else
-                current_angular = speed_angular;
+                control_turn = target_turn;
 
-          
-            var twist = new ROSLIB.Message({
+            if (/*(oldSpeed !== control_speed)||(oldTurn !== control_turn)*/ true){
+/*            var twist = new ROSLIB.Message({
                  linear : {
-                 x : current_linear,
+                 x : control_speed,
                  y : 0.0,
                  z : 0.0
                 },
                 angular : {
                 x : 0.0,
                 y : 0.0,
-                z : current_angular
+                z : control_turn
                 }
             });
 
-            console.log("Linear speed:",current_linear);
-            console.log("Linear angular:",current_angular);
-
-            cmdVelTopic.publish(twist);
+            cmdVelTopic.publish(twist);*/
 
 
-       };    //end of different speed check
+          }; //end of different speed check
+
+        /*twist.linear.x = control_speed;
+        twist.angular.z = control_turn;
+*/
+        // Publish the message 
+        
+        console.log('target_speed = '+target_speed);
+       console.log('target_turn = '+target_turn);
+      };//end of for loop
+
     };  //end of else
      }); //end of data receive event
 }); //end of connection event
@@ -271,6 +222,21 @@ window.onunload = window.onbeforeunload = function(e) {
     peer.destroy();
   }
 };
+
+
+window.onload = window.onbeforeunload = function(e) {
+toggle_div();
+
+};
+
+function toggle_div() {
+    var x = document.getElementById("div-assign");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+  };
 
 
 

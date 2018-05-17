@@ -31,15 +31,20 @@
             <form action="">
               <label for="cb1"><input id="cb_video" type="checkbox" checked="checked" onclick="video_handleClick(this);">Video Enable</label> 
               <label for="cb2"><input id="cb_audio" type="checkbox" onclick="audio_handleClick(this);">Audio Enable</label>
+              <table>
+             <tr><td>Linear X</td><td><input id="linearXText" name="linearXText" type="text" value="0.15"/></td></tr>
+             <tr><td>Angular Z</td><td><input id="angularZText" name="angularZText" type="text" value="1"/></td></tr>
+        </table>
             </form>           
             <br /><br />
             <video id="remoteStream" width="600" controls></video>
             <br /><br />
-            <input type="text" id="remoteId" placeholder="Remote ID">
-            <button id="btnCall">Call</button>
+
         </div>
         <div id="div-assign">
-            <br /><br />
+            <input type="text" id="remoteId" placeholder="Remote ID">
+            <button id="btnCall">Call</button>
+            <br />
             <input type="text" id="txtUsername" placeholder="Enter your username">
             <button id="btnSignUp">Sign Up</button>
         </div>  
