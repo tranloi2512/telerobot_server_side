@@ -218,8 +218,42 @@ peer.on('connection', function(conn) {
       }; //emd of switch
  
       // Got all parame from key board event, 
-      // TO DO: Publish chefbot_cmd_vel topic
-     cmdVel.publish(twist);
+      for (count = 0;count <=10; count++){
+          if (speed_linear > current_linear)
+                current_linear = Math.min( speed_linear, current_linear + speed_step );
+            else if (speed_linear < current_linear)
+                current_linear = Math.max( speed_linear, current_linear - speed_step );
+            else
+                current_linear = speed_linear;
+
+            if (speed_angular > current_angular)
+                current_angular = Math.min( speed_angular, current_angular + speed_step );
+            else if (speed_angular < current_angular)
+                current_angular = Math.max( speed_angular, current_angular - speed_step );
+            else
+                current_angular = speed_angular;
+
+          
+            var twist = new ROSLIB.Message({
+                 linear : {
+                 x : current_linear,
+                 y : 0.0,
+                 z : 0.0
+                },
+                angular : {
+                x : 0.0,
+                y : 0.0,
+                z : current_angular
+                }
+            });
+
+            console.log("Linear speed:",current_linear);
+            console.log("Linear angular:",current_angular);
+
+            cmdVelTopic.publish(twist);
+
+
+       };    //end of different speed check
     };  //end of else
      }); //end of data receive event
 }); //end of connection event
