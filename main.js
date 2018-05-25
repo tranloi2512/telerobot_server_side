@@ -100,6 +100,8 @@ const peer = new Peer({
 var key_count=0;
 var key_max=100;
 var stream_flag=false;
+var control_speed=0;
+var control_turn=0;
 peer.on('connection', function(conn) {
   // Receive messages
       conn.on('data', function(data) {
@@ -129,8 +131,7 @@ peer.on('connection', function(conn) {
         //console.log('move forward');  
         console.log("forward");
         target_speed = speed;
-        target_turn = 0;
-        count++;
+        target_turn = 0;       
         break;
         
         case 188: //backward
@@ -178,7 +179,7 @@ peer.on('connection', function(conn) {
                 control_turn = target_turn;
 
             if (/*(oldSpeed !== control_speed)||(oldTurn !== control_turn)*/ true){
-/*            var twist = new ROSLIB.Message({
+           var twist = new ROSLIB.Message({
                  linear : {
                  x : control_speed,
                  y : 0.0,
@@ -191,7 +192,7 @@ peer.on('connection', function(conn) {
                 }
             });
 
-            cmdVelTopic.publish(twist);*/
+            cmdVel.publish(twist);
 
 
           }; //end of different speed check
@@ -201,8 +202,8 @@ peer.on('connection', function(conn) {
 */
         // Publish the message 
         
-        console.log('target_speed = '+target_speed);
-       console.log('target_turn = '+target_turn);
+        console.log('control_speed = '+control_speed);
+       console.log('control_turn = '+control_turn);
       };//end of for loop
 
     };  //end of else
