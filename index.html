@@ -4,24 +4,24 @@
        
         <title>WebRTC</title>
          <meta http-equiv="Content-Type" content="text/html; charset=utf-8"> 
-        <meta http-equiv="Content-Language" content="en-us">
-        
-      <!--   <link href="fancy.css" rel="stylesheet" type="text/css"> -->
-       
+        <meta http-equiv="Content-Language" content="en-us"> 
         <script src="jquery.js"></script>
+        <script src="eventemitter2.min.js"></script>
         <script src="peer.js"></script>
         <script src="socket.io.js"></script>
         <script src="roslib.js"></script>
-
-
-
-       
-        
-        
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
  
     </head>
     <body>
         <h1>Telepresence Robot Server</h1>
+          <div id="div_UI" class = "UI"> 
+                <h4> UI Control </h4> 
+                <p> Robot ID: </p> <ul id="ulUser"> </ul>
+                <input type="text" id="txtUsername" placeholder=" Enter your username" class="text_box" >
+                 <button id="btnSignUp">Sign Up</button>
+            </div>
+
         <div id="div-chat">
             <p>Online user:</p>
             <ul id="ulUser">

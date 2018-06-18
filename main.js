@@ -1,20 +1,17 @@
-
-
+$('#div_Control').hide();
 ///
-///     Deply TURN Server via Ajax
+///     Socket.io Connect
 ///
-let customConfig;
-         $.ajax ({
-             url: "https://global.xirsys.net/_turn/tranloi2512.github.io/",
-             type: "PUT",
-             async: false,
-             headers: {
-               "Authorization": "Basic " + btoa("tranloi2512:1504b54e-a2d9-11e7-b628-1c12c2a160ac")
-             },
-             success: function (res){
-               console.log("ICE List: "+res.v.iceServers);
-               customConfig = res.v.iceServers;
-             }});
+const socket = io('https://tmlsocketio.herokuapp.com/');
+var remoteID='';
+var recognizing;
+var final_transcript = '';
+var imshow_transcript = '';
+var recognition = new webkitSpeechRecognition();
+recognition.continuous = true;
+recognition.lang = 'en-PH';
+recognition.interimResults = true;
+
 
 ///
 ///     Check wheather audio or video activation
@@ -30,6 +27,53 @@ function audio_handleClick(cb2) {
   console.log("Audio enable = " + cb2.checked);
   audio_enable = cb2.checked;
 }
+
+
+///
+///     Deply TURN Server via Ajax
+///
+let customConfig;
+ $.ajax ({
+             url: "https://global.xirsys.net/_turn/tranloi2512.github.io/",
+             type: "PUT",
+             async: false,
+             headers: {
+               "Authorization": "Basic " + btoa("tranloi2512:1504b54e-a2d9-11e7-b628-1c12c2a160ac")
+             },
+             success: function (res){
+               console.log("ICE List: "+res.v.iceServers);
+               customConfig = res.v.iceServers;
+             }
+         });
+
+
+///
+///     Get Online User List From Socket.io Server
+///
+socket.on('ONLINE_USER_LIST',arrUserInfo => {
+    $('#div-chat').show();
+    $('#div-assign').hide();
+    arrUserInfo.forEach(user =>{
+        const {name,peerId} = user;
+        $('#ulUser').append(`<li id="${peerId}">${name}</li>`);
+     });
+
+    socket.on('NEW_USER',user => {
+        const {name,peerId} = user;
+        $('#ulUser').append(`<li id="${peerId}">${name}</li>`);
+    });
+    
+    socket.on('USER_DISCONNECT',peerId => {
+        $(`#${peerId}`).remove();
+    });
+});
+
+///
+///     Check Dupplicate User Name
+///
+socket.on('ASSIGN_FAIL',() =>{
+    alert('This UserName Is Already Assigned!');
+});
 
 
 ///
@@ -79,23 +123,27 @@ angular : {
 });
 
 
+
 ///
 ///		Creat Peerjs Connect
 ///
-const peer = new Peer({
-       key: 'peerjs', 
-       host: 'tmlpeerjs.herokuapp.com', 
-       secure: true, 
-       port: 443,
-       config: customConfig
-       });
-    peer.on('open', id => {
+var my_peer;
+var peer = new Peer({
+    key: 'peerjs', 
+    host: 'tmlpeerjs.herokuapp.com', 
+    secure: true, 
+    port: 443,
+    config: customConfig
+    });
+peer.on('open', id => {
+    my_peer=id;
     $('#my-peer').append(id);
-   /* $('#btnSignUp').click(() => {
+    $('#btnSignUp').click(() => {
         const username = $('#txtUsername').val();
         socket.emit('NEW_USER_ASSIGN', { name: username, peerId: id });
-    });*/
+    });
 });
+
 
 var key_count=0;
 var key_max=100;
@@ -114,7 +162,6 @@ peer.on('connection', function(conn) {
         console.log('flag'+stream_flag);
         openStream()
           .then(stream => {
-            playStream('localStream', stream);
           const call = peer.call(id, stream);
           // call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
     });
@@ -212,10 +259,6 @@ peer.on('connection', function(conn) {
 
 
 ///
-///     
-
-
-///
 ///     Window Closing Handler
 ///
 window.onunload = window.onbeforeunload = function(e) {
@@ -225,24 +268,48 @@ window.onunload = window.onbeforeunload = function(e) {
 };
 
 
-window.onload = window.onbeforeunload = function(e) {
-toggle_div();
-
-};
-
+///
+/// Function to HIDE and SHOW UI div
+///
 function toggle_div() {
-    var x = document.getElementById("div-assign");
+    var x = document.getElementById("div_UI");
     if (x.style.display === "none") {
         x.style.display = "block";
     } else {
         x.style.display = "none";
     }
-  };
+
+    var x = document.getElementById("div_Control");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+    }
+    return 1;
+    return 1;
+}
 
 
 
 ///
 ///		Callee Event Handler
+///
+peer.on('call', call => {
+    openStream()
+    .then(stream => {
+        call.answer(stream);
+       // playStream('localStream', stream);
+        call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
+  
+	 });
+
+
+
+});
+
+
+///
+///   Callee Event Handler
 ///
 peer.on('call', call => {
     console.log('Received Call Request...Start Streaming')
@@ -254,9 +321,6 @@ peer.on('call', call => {
         call.on('stream', remoteStream => playStream('remoteStream', remoteStream));
     });
 });
-
-
-
 
 ///
 ///		Get Media Stream
@@ -276,4 +340,3 @@ function playStream(idVideoTag,stream){
 	video.srcObject = stream;
 	video.play();
 }
-
